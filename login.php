@@ -1,13 +1,23 @@
 <?php
+session_start();
 
-if (isset($_SESSION['user_id'])) {
-    // Redirect if the user is already logged in
-    header("Location: index.php");
-    exit();
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: add.php");
+    exit;
 }
 
+if (isset($_POST['save_btn'])) {
+    $p_name = $_POST['myname'];
+    $p_pass = $_POST['mypass'];
+    if ($p_name === 'admin' && $p_pass === '123') {
+        $_SESSION['admin_logged_in'] = true;
+        header("Location: index.php");
+        exit;
+    } else {
+        $error_message = "Invalid username or password";
+    }
+}
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,103 +25,110 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Admin Login</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: radial-gradient(circle,rgb(160, 168, 253),rgb(164, 175, 252));
+        color: white;
+        animation: gradientAnimation 10s infinite alternate;
+    }
+
+    @keyframes gradientAnimation {
+        0% {
+            background: radial-gradient(circle,rgb(167, 123, 73),rgb(148, 126, 53));
+        }
+
+        50% {
+            background: radial-gradient(circle, #2c387e, #3f51b5);
+        }
+
+        100% {
+            background: radial-gradient(circle, #1a237e, #3949ab);
+        }
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .form-container h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333333;
+    }
+
+    .form-container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555555;
+        text-align: left;
+    }
+
+    .form-container input[type="text"],
+    .form-container input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #cccccc;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .form-container input[type="submit"] {
+        background-color:rgb(35, 137, 247);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .form-container input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    .error-message {
+        color: red;
+        margin-top: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+    </style>
+
 </head>
+<div class="form-container">
+    <h1>Admin Login</h1>
+    <form method="post" action="">
+        <label for="myname">Username</label>
+        <input type="text" id="myname" name="myname" placeholder="Enter your username" required>
 
-<body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                Fruitables
-            </a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item bg-success px-4 mx-3 rounded">
-                        <a class="nav-link text-white" href="registration.php">Registration</a>
-                    </li>
-                    <li class="nav-item bg-success px-4 rounded">
-                        <a class="nav-link text-white" href="login.php">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        <label for="mypass">Password</label>
+        <input type="password" id="mypass" name="mypass" placeholder="Enter your password" required>
 
-    <!-- Login Form -->
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h4>Login</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="login.php">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" id="email" name="email" class="form-control"
-                                    placeholder="Enter your email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" id="password" name="password" class="form-control"
-                                    placeholder="Enter your password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100" name="login_btn">Login</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-3 mt-5">
-        <p class="mb-0">&copy; 2025 MyApp. All rights reserved.</p>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <input type="submit" name="save_btn" value="Login">
+    </form>
+    <?php if (isset($error_message)) : ?>
+    <div class="error-message"><?= $error_message ?></div>
+    <?php endif; ?>
+</div>
 </body>
 
 </html>
-
-
-    <?php
-    include('dbcon.php');
-   // session_start();
-
-    if (isset($_POST['login_btn'])) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        // Query the database for the user
-        $qry = "SELECT * FROM login WHERE email = '$email'";
-        $result = mysqli_query($connection, $qry);
-
-        if (mysqli_num_rows($result) > 0) {
-            $row = mysqli_fetch_assoc($result);
-
-            // Check if the password matches
-            if ($password == $row['password']) {
-                // Store user information in session
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['user_name'] = $row['name'];
-                $_SESSION['user_email'] = $row['email'];
-
-                // Redirect to the dashboard
-                echo "<script type='text/javascript'>alert('Login successful!');</script>";
-                echo "<script type='text/javascript'>window.location.href = 'index.php';</script>";
-            } else {
-                echo "<script type='text/javascript'>alert('Invalid password. Please try again!');</script>";
-            }
-        } else {
-            echo "<script type='text/javascript'>alert('Invalid email. Please try again!');</script>";
-        }
-    }
-    ?>
-    </body>
-    </html>
